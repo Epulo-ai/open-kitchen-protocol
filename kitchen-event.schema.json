@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://okp.epulo.ai/schema/kitchen-event.schema.json",
+  "title": "OKP Kitchen Event",
+  "description": "Atomic operational event in a professional kitchen. OKP v0.1 DRAFT.",
+  "type": "object",
+  "required": ["event_id", "site_id", "verb", "t_start", "outcome", "source", "confidence", "privacy_tier"],
+  "properties": {
+    "event_id": { "type": "string", "format": "uuid" },
+    "site_id": { "type": "string" },
+    "station_id": { "type": "string" },
+    "actor_ref": {
+      "type": "string",
+      "description": "Pseudonymous role token, e.g. 'hot-line-a'. MUST NOT contain names, initials or personnel numbers.",
+      "pattern": "^[a-z0-9-]{2,32}$"
+    },
+    "actor_kind": { "enum": ["human", "robot", "agent"] },
+    "task_ref": { "type": "string" },
+    "verb": {
+      "enum": [
+        "wash", "peel", "cut", "portion", "mix", "marinate", "weigh",
+        "fry", "grill", "bake", "boil", "steam", "saute", "hold_hot", "chill", "regenerate",
+        "plate", "wrap", "garnish", "pack", "combine",
+        "transport", "restock", "receive", "store", "retrieve", "dispose",
+        "clean_surface", "clean_equipment", "wash_dishes", "sanitize", "handwash_cycle",
+        "check_temp", "check_stock", "taste", "inspect", "document", "handover"
+      ]
+    },
+    "variant": { "type": "string", "description": "Free qualifier, e.g. 'julienne', 'blast'." },
+    "object_refs": { "type": "array", "items": { "type": "string" } },
+    "t_start": { "type": "string", "format": "date-time" },
+    "t_end": { "type": "string", "format": "date-time" },
+    "outcome": { "enum": ["completed", "interrupted", "failed", "rework"] },
+    "measures": {
+      "type": "object",
+      "properties": {
+        "temp_c": { "type": "number" },
+        "weight_g": { "type": "number" },
+        "count": { "type": "integer" },
+        "distance_m": { "type": "number" },
+        "energy_wh": { "type": "number" },
+        "duration_s": { "type": "number" }
+      },
+      "additionalProperties": { "type": "number" }
+    },
+    "quality_flags": {
+      "type": "array",
+      "items": { "enum": ["haccp_deviation", "spill", "near_miss", "allergen_risk", "stockout", "equipment_fault"] }
+    },
+    "source": { "enum": ["pos", "sensor", "vision", "manual", "robot_log", "agent"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "privacy_tier": {
+      "enum": ["T1", "T2", "T3"],
+      "description": "T0 (raw streams) is not representable in this schema by design: raw streams never leave the site."
+    },
+    "session_ref": {
+      "type": "string",
+      "description": "Reference to a RecordingSession object carrying consent_scope, workforce_agreement_ref (works council, union or local equivalent; null where not applicable) and retention_days. Required when actor_kind is 'human'."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "actor_kind": { "const": "human" } }, "required": ["actor_kind"] },
+      "then": { "required": ["session_ref"] }
+    }
+  ],
+  "additionalProperties": false
+}

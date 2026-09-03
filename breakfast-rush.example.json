@@ -1,0 +1,80 @@
+{
+  "description": "Synthetic OKP v0.1 sample: 4 events from a motorway-format site during breakfast rush. All data invented for illustration. Privacy tier T2 (actor tokens removed where human).",
+  "site": {
+    "site_id": "site-de-a8-014",
+    "format": "motorway",
+    "country": "DE",
+    "daypart_profile": "commuter-heavy"
+  },
+  "events": [
+    {
+      "event_id": "3f1c2a9e-0000-4000-8000-000000000001",
+      "site_id": "site-de-a8-014",
+      "station_id": "hot-01",
+      "actor_kind": "robot",
+      "actor_ref": "fry-unit-01",
+      "verb": "fry",
+      "variant": "batch",
+      "object_refs": ["ing-potato-wedge-10mm"],
+      "t_start": "2026-09-03T07:41:12Z",
+      "t_end": "2026-09-03T07:44:48Z",
+      "outcome": "completed",
+      "measures": { "weight_g": 1800, "temp_c": 174, "energy_wh": 310, "duration_s": 216 },
+      "source": "robot_log",
+      "confidence": 0.99,
+      "privacy_tier": "T2"
+    },
+    {
+      "event_id": "3f1c2a9e-0000-4000-8000-000000000002",
+      "site_id": "site-de-a8-014",
+      "station_id": "assembly-01",
+      "actor_kind": "human",
+      "actor_ref": "assembly-a",
+      "verb": "plate",
+      "object_refs": ["prod-breakfast-box-02"],
+      "t_start": "2026-09-03T07:45:02Z",
+      "t_end": "2026-09-03T07:45:41Z",
+      "outcome": "completed",
+      "measures": { "count": 3, "duration_s": 39 },
+      "source": "vision",
+      "confidence": 0.87,
+      "privacy_tier": "T2",
+      "session_ref": "rs-2026-09-site014-shift-early"
+    },
+    {
+      "event_id": "3f1c2a9e-0000-4000-8000-000000000003",
+      "site_id": "site-de-a8-014",
+      "station_id": "hot-01",
+      "actor_kind": "agent",
+      "actor_ref": "epulo-orchestrator",
+      "verb": "check_stock",
+      "object_refs": ["ing-potato-wedge-10mm"],
+      "t_start": "2026-09-03T07:46:00Z",
+      "t_end": "2026-09-03T07:46:01Z",
+      "outcome": "completed",
+      "measures": { "count": 4 },
+      "quality_flags": ["stockout"],
+      "source": "agent",
+      "confidence": 0.95,
+      "privacy_tier": "T3"
+    },
+    {
+      "event_id": "3f1c2a9e-0000-4000-8000-000000000004",
+      "site_id": "site-de-a8-014",
+      "station_id": "hot-01",
+      "actor_kind": "human",
+      "actor_ref": "runner-b",
+      "verb": "restock",
+      "object_refs": ["ing-potato-wedge-10mm"],
+      "t_start": "2026-09-03T07:49:30Z",
+      "t_end": "2026-09-03T07:52:10Z",
+      "outcome": "completed",
+      "measures": { "weight_g": 9000, "distance_m": 42, "duration_s": 160 },
+      "source": "manual",
+      "confidence": 0.6,
+      "privacy_tier": "T2",
+      "session_ref": "rs-2026-09-site014-shift-early"
+    }
+  ],
+  "note": "Even four events tell a story: the robot fried, a human plated, the agent caught an imminent stockout, a human restocked. Cost, latency and automation-readiness fall out of the data structurally."
+}
