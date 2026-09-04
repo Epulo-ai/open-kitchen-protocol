@@ -1,1 +1,26 @@
+name: Validate OKP examples
+
+# Every example in this repository must be valid against the schema it
+# illustrates. A pull request that changes the schema and forgets the examples,
+# or adds an example that does not parse, fails here rather than in someone
+# else's implementation.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate examples against the schema
+        run: python3 tools/validate_okp.py --strict examples/*.json
 
