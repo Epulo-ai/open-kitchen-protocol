@@ -34,6 +34,29 @@ OKP is built to survive the world's strictest privacy regimes — GDPR, German w
 - `examples/breakfast-rush.example.json` — a synthetic morning shift at a German motorway site, robot and human events side by side
 - `examples/banqueting.example.json` — a synthetic banqueting service across multiple sites, long-duration prep tasks
 - `examples/inflight.example.json` — a synthetic inflight catering run, high-count tray-line production
+
+## Validating your data
+
+The repository ships a validator with no dependencies at all: Python 3.8 or
+newer, standard library only. It reads the vocabulary from
+`schema/kitchen-event.schema.json`, so it cannot drift away from the spec.
+Adding a verb to the schema is enough; the validator picks it up.
+
+It accepts a single event object, an array of events, or an episode file with
+an `events` array, and it checks three things a JSON Schema cannot express:
+
+- **Time.** `t_end` cannot precede `t_start`, and `measures.duration_s` has to
+  agree with the timestamps.
+- **Identity.** `event_id` must be unique within a file, and an `actor_ref`
+  that looks like a person rather than a pseudonymous role token is an error,
+  not a style note.
+- **Provenance.** A `vision` or `manual` observation recorded at full
+  confidence is flagged. The `confidence` field exists to carry uncertainty,
+  not to hide it.
+
+Errors fail the run. Warnings are advisory unless you pass `--strict`, which is
+what CI runs on every pull request.
+
 ## Contributing
 
 v0.1 is a conversation starter. We are looking for:
