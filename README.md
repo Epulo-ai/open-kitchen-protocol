@@ -2,7 +2,7 @@
 
 **A shared language for describing what actually happens in professional kitchens, built for the physical AI era.**
 
-Stewarded by [epulo.ai](https://epulo.ai). Working draft — not yet published.
+Stewarded by [epulo.ai](https://epulo.ai). Stewarded by epulo.ai. v0.1, published on GitHub and Hugging Face. Feedback and implementations welcome.
 
 ---
 
