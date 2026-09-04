@@ -2,7 +2,7 @@
 
 **A shared language for describing what actually happens in professional kitchens, built for the physical AI era.**
 
-Stewarded by [epulo.ai](https://epulo.ai). Stewarded by [epulo.ai](https://epulo.ai). v0.1, published on [GitHub](https://github.com/Epulo-ai/open-kitchen-protocol) and [Hugging Face](https://huggingface.co/datasets/Epulo-ai/open-kitchen-protocol). Feedback and implementations welcome.
+Stewarded by [epulo.ai](https://epulo.ai). v0.1, published on [GitHub](https://github.com/Epulo-ai/open-kitchen-protocol) and [Hugging Face](https://huggingface.co/datasets/Epulo-ai/open-kitchen-protocol). Feedback and implementations welcome.
 ---
 
 ## Why this exists
@@ -47,7 +47,7 @@ Open an issue, or propose changes via pull request. Substantial contributors are
 
 ## License
 
-Protocol and documentation: Apache 2.0 (proposed — final license set at publication).
+Protocol and documentation: Apache 2.0. See `LICENSE`.
 
 ## Status
 
