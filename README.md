@@ -42,6 +42,12 @@ newer, standard library only. It reads the vocabulary from
 `schema/kitchen-event.schema.json`, so it cannot drift away from the spec.
 Adding a verb to the schema is enough; the validator picks it up.
 
+```
+python3 tools/validate_okp.py examples/*.json
+python3 tools/validate_okp.py --strict my-episode.json
+cat episode.json | python3 tools/validate_okp.py -
+```
+
 It accepts a single event object, an array of events, or an episode file with
 an `events` array, and it checks three things a JSON Schema cannot express:
 
