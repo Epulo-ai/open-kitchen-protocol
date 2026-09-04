@@ -53,9 +53,13 @@
       "enum": ["T1", "T2", "T3"],
       "description": "T0 (raw streams) is not representable in this schema by design: raw streams never leave the site."
     },
-    "session_ref": {
+        "session_ref": {
       "type": "string",
       "description": "Reference to a RecordingSession object carrying consent_scope, workforce_agreement_ref (works council, union or local equivalent; null where not applicable) and retention_days. Required when actor_kind is 'human'."
+    },
+    "service_context_ref": {
+      "type": "string",
+      "description": "Reference to a ServiceContext object (ref, type, covers) describing the service this event belongs to: a banquet, a flight leg, a ward round. Absent for routine a la carte production."
     }
   },
   "allOf": [
@@ -66,7 +70,3 @@
   ],
   "additionalProperties": false
 }
-    "service_context_ref": {
-      "type": "string",
-      "description": "Reference to a ServiceContext object (ref, type, covers) describing the service this event belongs to: a banquet, a flight leg, a ward round. Absent for routine a la carte production."
-    }
