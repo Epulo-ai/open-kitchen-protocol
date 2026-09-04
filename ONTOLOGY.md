@@ -24,6 +24,8 @@ This document defines the conceptual model. The machine-readable form lives in `
 | `Task` | A unit of work with a purpose | task_id, verb (see taxonomy), object, station, nominal_duration_s, skill_level, automation_readiness (0–5) |
 | `Order` | A demand event | order_id, products[], channel, placed_at, promised_at |
 | `Shift` | A staffing period | shift_id, site, start, end, planned_actors, unfilled_positions |
+| `ServiceContext` | A bounded service occasion that groups events: one banquet, one flight leg, one ward round | service_context_ref, type (banquet, flight_leg, ward_round, event_catering, a_la_carte), covers, scheduled_start |
+| `RecordingSession` | A bounded period of data capture involving human actors, and the consent under which it happened | session_ref, consent_scope, workforce_agreement_ref (works council, union or local equivalent; null where not applicable), retention_days, privacy_tier |
 | `Event` | A timestamped observation | see section 4 |
 
 ## 3. Action taxonomy
@@ -48,13 +50,16 @@ Event {
   event_id, site_id, station_id,
   actor_ref,            // pseudonymous
   task_ref | verb,      // what was done
+  service_context_ref,  // the service occasion this event belongs to, where one applies
   object_refs[],        // ingredients/products/equipment involved
   t_start, t_end,       // ISO 8601
   outcome,              // completed | interrupted | failed | rework
   measures{},           // temp_c, weight_g, count, distance_m, energy_wh …
   quality_flags[],      // e.g. haccp_deviation, spill, near_miss
   source,               // pos | sensor | vision | manual | robot_log | agent
-  confidence            // 0–1, honesty about data provenance
+  confidence,            // 0–1, honesty about data provenance
+  privacy_tier,         // T1 | T2 | T3, T0 never leaves the site
+  session_ref           // required whenever actor_kind is human
 }
 ```
 
