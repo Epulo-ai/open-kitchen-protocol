@@ -31,8 +31,9 @@ OKP is built to survive the world's strictest privacy regimes — GDPR, German w
 
 - `ONTOLOGY.md` — the conceptual model: entities, action taxonomy, event model, LeRobot mapping
 - `schema/kitchen-event.schema.json` — JSON Schema for the core event record
-- `examples/breakfast-rush.example.json` — a synthetic sample episode from a motorway site
-
+- `examples/breakfast-rush.example.json` — a synthetic morning shift at a German motorway site, robot and human events side by side
+- `examples/banqueting.example.json` — a synthetic banqueting service across multiple sites, long-duration prep tasks
+- `examples/inflight.example.json` — a synthetic inflight catering run, high-count tray-line production
 ## Contributing
 
 v0.1 is a conversation starter. We are looking for:
