@@ -66,3 +66,7 @@
   ],
   "additionalProperties": false
 }
+    "service_context_ref": {
+      "type": "string",
+      "description": "Reference to a ServiceContext object (ref, type, covers) describing the service this event belongs to: a banquet, a flight leg, a ward round. Absent for routine a la carte production."
+    }
