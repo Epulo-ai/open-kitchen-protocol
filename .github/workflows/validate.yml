@@ -1,4 +1,4 @@
-name: Validate OKP examples
+name: Validate OKP
 
 # Every example in this repository must be valid against the schema it
 # illustrates. A pull request that changes the schema and forgets the examples,
@@ -21,6 +21,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Run validator regression tests
+        run: python3 -m unittest discover -s tests -v
+
       - name: Validate examples against the schema
         run: python3 tools/validate_okp.py --strict examples/*.json
-
