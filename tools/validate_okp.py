@@ -345,11 +345,23 @@ def find_schema():
     return None
 
 
+def reject_non_json_constant(value):
+    """Reject JavaScript-style numeric constants that are not valid JSON."""
+    raise ValueError(
+        "invalid JSON constant {!r}: JSON permits neither NaN nor Infinity".format(value)
+    )
+
+
+def load_json(handle):
+    """Load JSON while rejecting non-standard numeric constants."""
+    return json.load(handle, parse_constant=reject_non_json_constant)
+
+
 def read_json(path):
     if path == "-":
-        return json.load(sys.stdin), "<stdin>"
+        return load_json(sys.stdin), "<stdin>"
     with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle), path
+        return load_json(handle), path
 
 
 def main(argv=None):
@@ -371,8 +383,8 @@ def main(argv=None):
         return 2
     try:
         with open(schema_path, "r", encoding="utf-8") as handle:
-            schema = json.load(handle)
-    except (OSError, json.JSONDecodeError) as exc:
+            schema = load_json(handle)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
         print("cannot read the schema at {}: {}".format(schema_path, exc), file=sys.stderr)
         return 2
 
@@ -383,7 +395,7 @@ def main(argv=None):
     for name in args.files:
         try:
             doc, label = read_json(name)
-        except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
             print("FAIL  {}\n  error    (file)                      {}".format(name, exc))
             total_errors += 1
             failed_files += 1
@@ -424,4 +436,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
     sys.exit(main())
-
