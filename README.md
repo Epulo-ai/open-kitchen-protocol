@@ -34,6 +34,54 @@ OKP is built to survive the world's strictest privacy regimes — GDPR, German w
 - `examples/breakfast-rush.example.json` — a synthetic morning shift at a German motorway site, robot and human events side by side
 - `examples/banqueting.example.json` — a synthetic banqueting service across multiple sites, long-duration prep tasks
 - `examples/inflight.example.json` — a synthetic inflight catering run, high-count tray-line production
+- `docs/CONFORMANCE.md` — the provisional strict validation profile and its limits
+
+## Independent quickstart
+
+You need Git and Python 3.8 or newer. The validator uses only Python's standard
+library. No Epulo account, CKB subscription, API key or hosted service is
+required.
+
+```sh
+git clone https://github.com/Epulo-ai/open-kitchen-protocol.git
+cd open-kitchen-protocol
+python3 tools/validate_okp.py --strict examples/*.json
+```
+
+For the current v0.1 draft, the expected summary is:
+
+```text
+3 files checked, 0 errors, 0 warnings (strict)
+```
+
+Create `my-event.json`:
+
+```json
+{
+  "event_id": "7d3e1a52-9f6b-4a1e-8c2d-1b5f0e7a3c94",
+  "site_id": "demo-kitchen-01",
+  "verb": "check_temp",
+  "t_start": "2026-09-06T10:00:00Z",
+  "t_end": "2026-09-06T10:00:01Z",
+  "outcome": "completed",
+  "source": "sensor",
+  "confidence": 0.98,
+  "privacy_tier": "T3"
+}
+```
+
+Then validate it:
+
+```sh
+python3 tools/validate_okp.py --strict my-event.json
+```
+
+This proves that the file passes the current OKP validator. It does not verify
+real-world provenance, food safety, robot performance or regulatory
+compliance. Record the revision you tested with `git rev-parse HEAD`; v0.1 is a
+working draft and breaking changes are expected. See
+[`docs/CONFORMANCE.md`](docs/CONFORMANCE.md) for the provisional validation
+profile and its limits.
 
 ## Validating your data
 
@@ -68,7 +116,7 @@ what CI runs on every pull request.
 v0.1 is a conversation starter. We are looking for:
 
 - **Operators** who can sanity-check the action taxonomy against real production
-- **Robotics engineers** who want a common target format (LeRobot-compatible mapping included)
+- **Robotics engineers** who want to review the conceptual LeRobot annotation mapping; a runnable converter is planned, not yet included
 - **Researchers** in food process engineering, HRI and operations research
 - **Culinary methodologists** — the taxonomy deliberately leaves room for structured culinary knowledge systems to plug in at the technique level
 
