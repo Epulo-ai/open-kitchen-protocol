@@ -46,6 +46,11 @@ and these repository-level checks:
 The repository's CI also runs its regression tests and validates every
 published example in strict mode.
 
+An additional [experimental tier actor-reference check](TIER_ACTOR_CHECK.md)
+is available with `--check-tier-actors`. It is opt-in and is not part of
+`okp-event-strict-v0.1-draft`. The current strict profile does not enforce the
+ontology's T2/T3 actor-reference boundary.
+
 ## What a pass does not prove
 
 A pass does not establish:

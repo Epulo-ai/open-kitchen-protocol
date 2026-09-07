@@ -25,7 +25,7 @@ The analogy: GTFS did this for public transport. FHIR did it for healthcare. Kit
 
 ## Privacy by design
 
-OKP is built to survive the world's strictest privacy regimes — GDPR, German works-council law, Illinois BIPA, CCPA — which makes it deployable everywhere. Human actors are never identified: the schema carries pseudonymous role tokens only, consent and workforce-agreement flags are first-class fields, and the reference architecture assumes on-site processing with aggregation before anything leaves the building. Where local law is more permissive, the same schema simply runs with lighter obligations; the data remains interoperable worldwide. See `ONTOLOGY.md`, section 6.
+OKP uses pseudonymous actor references and describes tiers for handling kitchen data. Human Events require a recording-session reference. The current validator does not resolve that session or establish consent, anonymity or legal compliance. An optional [tier actor-reference check](docs/TIER_ACTOR_CHECK.md) detects actor references on T2/T3 Events; complete tier and exchange rules remain in development. See `ONTOLOGY.md`, section 6, for the intended policy and its current implementation limits.
 
 ## Repository layout
 

@@ -14,6 +14,8 @@ Accepts three shapes:
 
 Exit code is 0 when every file passes and 1 when any error is found.
 --strict also fails on warnings.
+--check-tier-actors additionally rejects actor_ref on T2/T3 Events. This
+experimental check does not establish anonymity or permission to share data.
 
 Zero dependencies: standard library only, Python 3.8 or newer.
 
@@ -305,7 +307,7 @@ def extract_events(doc):
     )
 
 
-def validate_document(doc, schema):
+def validate_document(doc, schema, check_tier_actors=False):
     findings = []
     events, kind = extract_events(doc)
     declared = collect_sites(doc)
@@ -320,6 +322,11 @@ def validate_document(doc, schema):
 
         validate(event, schema, path, findings)
         check_event_semantics(event, path, declared, findings)
+
+        if check_tier_actors and event.get("privacy_tier") in ("T2", "T3") and "actor_ref" in event:
+            findings.append(Finding("error", path + ".actor_ref", (
+                "actor_ref must be absent for {} when --check-tier-actors is enabled"
+            ).format(event["privacy_tier"])))
 
         event_id = event.get("event_id")
         if isinstance(event_id, str):  # a non-string id is already an error above
@@ -371,6 +378,8 @@ def main(argv=None):
     parser.add_argument("--schema", default=None,
                         help="path to kitchen-event.schema.json (found automatically in a checkout)")
     parser.add_argument("--strict", action="store_true", help="treat warnings as failures")
+    parser.add_argument("--check-tier-actors", action="store_true",
+                        help="experimental: reject actor_ref on T2/T3 Events; does not establish anonymity")
     parser.add_argument("--quiet", action="store_true", help="print only failures and the summary")
     args = parser.parse_args(argv)
 
@@ -402,7 +411,7 @@ def main(argv=None):
             continue
 
         try:
-            findings, kind, count = validate_document(doc, schema)
+            findings, kind, count = validate_document(doc, schema, args.check_tier_actors)
         except ValueError as exc:
             print("FAIL  {}\n  error    (root)                      {}".format(label, exc))
             total_errors += 1
@@ -425,11 +434,12 @@ def main(argv=None):
             for finding in findings:
                 print(finding)
 
-    print("\n{} file{} checked, {} error{}, {} warning{}{}".format(
+    print("\n{} file{} checked, {} error{}, {} warning{}{}{}".format(
         len(args.files), "" if len(args.files) == 1 else "s",
         total_errors, "" if total_errors == 1 else "s",
         total_warnings, "" if total_warnings == 1 else "s",
-        " (strict)" if args.strict else ""))
+        " (strict)" if args.strict else "",
+        " (tier-actor check)" if args.check_tier_actors else ""))
 
     return 1 if failed_files else 0
 
