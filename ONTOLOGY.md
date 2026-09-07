@@ -6,7 +6,7 @@ This document defines the conceptual model. The machine-readable form lives in `
 
 1. **Operator-first.** Concepts map to how kitchens are actually run (stations, shifts, covers, mise en place), not to how software engineers imagine them.
 2. **Actor-agnostic.** A task is the same task whether a human, a robot arm or a software agent performs it. Automation readiness becomes measurable instead of ideological.
-3. **Privacy by construction.** Humans appear only as pseudonymous role tokens. Identification is impossible at the schema level, not merely discouraged at the policy level.
+3. **Privacy-oriented representation.** Human actor references use pseudonymous role tokens. Context and linked records still require appropriate controls; the schema alone cannot establish anonymity.
 4. **Composable.** Sites contain stations; recipes decompose into tasks; tasks decompose into actions. Every level can be recorded independently.
 5. **Interoperable.** Events map cleanly onto robot-learning episode formats (see section 7).
 
@@ -73,7 +73,7 @@ Design choices worth defending:
 
 From events alone, without any additional instrumentation, OKP data yields: cost per cover, station cycle times, thermal energy per product, waste ratio by cause, unfilled-hour coverage, order-to-pass latency, rework rate, and HACCP compliance evidence as a by-product. This is deliberate: the operator gets a management dividend from day one, which is what makes data collection politically survivable on the floor.
 
-## 6. Privacy tiers (strictest-regime-proof, globally deployable)
+## 6. Privacy tiers (draft policy and implementation status)
 
 | Tier | Content | Leaves the site? |
 |---|---|---|
@@ -82,7 +82,9 @@ From events alone, without any additional instrumentation, OKP data yields: cost
 | T2 | Sessionized events, actor field removed | Shareable under license |
 | T3 | Aggregates (station × daypart) | Publishable / open |
 
-Consent, works-council agreement reference and retention period are schema fields on the recording session, not paperwork stored elsewhere. If the fields are empty, conformant tooling refuses to record humans. That rule is the difference between a dataset and a liability.
+These are intended tier policies, not properties established by an Event schema pass. The current synthetic T2/T3 examples retain actor references. The optional [tier actor-reference check](docs/TIER_ACTOR_CHECK.md) detects that mismatch without changing the existing strict profile. T3 aggregation and other reference-linkage rules remain to be specified and implemented. Tier labels alone do not grant sharing or publication rights.
+
+Consent scope, workforce-agreement reference and retention period are conceptual RecordingSession fields. The Event schema requires `session_ref` when `actor_kind` is `human`; current tooling does not resolve the referenced session or verify those fields. It must not be described as enforcing consent or preventing capture when session metadata is absent.
 
 ## 7. Robot-learning mapping (LeRobot compatibility)
 
