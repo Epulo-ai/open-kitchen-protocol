@@ -1,6 +1,7 @@
 ---
 license: apache-2.0
 pretty_name: Open Kitchen Protocol (OKP)
+thumbnail: "https://raw.githubusercontent.com/Epulo-ai/open-kitchen-protocol/main/publishing/okp-card.png"
 language:
 - en
 tags:
@@ -30,9 +31,12 @@ source of truth: specifications, validator, tests and contribution process.
 This Hugging Face dataset provides synthetic fixtures and the corresponding
 protocol snapshot for inspection and evaluation.
 
-This release snapshot corresponds to frozen GitHub commit
-[`{{GITHUB_SHA}}`](https://github.com/Epulo-ai/open-kitchen-protocol/tree/{{GITHUB_SHA}})
-and the immutable `v0.2` tag.
+This snapshot was built from GitHub commit
+[`{{GITHUB_SHA}}`](https://github.com/Epulo-ai/open-kitchen-protocol/tree/{{GITHUB_SHA}}).
+Every protocol file in it is a byte copy of the immutable
+[`v0.2`](https://github.com/Epulo-ai/open-kitchen-protocol/tree/v0.2) tag. A later
+commit on `main` may change packaging or presentation; the frozen protocol moves
+only with a new version.
 [alignment.json](alignment.json) records source paths and SHA-256 checksums.
 
 ## Explore one kitchen scenario
