@@ -14,8 +14,8 @@ Accepts three shapes:
 
 Exit code is 0 when every file passes and 1 when any error is found.
 --strict also fails on warnings.
---check-tier-actors additionally rejects actor_ref on T2/T3 Events. This
-experimental check does not establish anonymity or permission to share data.
+The v0.2 schema rejects actor_ref on human T2/T3 Events. A schema pass does
+not establish anonymity, consent or permission to share data.
 
 Zero dependencies: standard library only, Python 3.8 or newer.
 
@@ -89,7 +89,7 @@ class Finding:
 # --------------------------------------------------------------------------
 # Only the keywords the OKP schema actually uses are implemented: type,
 # required, properties, additionalProperties, enum, const, pattern, format
-# (uuid, date-time), minimum, maximum, items, allOf, if/then/else. An unknown
+# (uuid, date-time), minimum, maximum, items, propertyNames, allOf, if/then/else and not. An unknown
 # keyword is ignored rather than pretended to be enforced.
 
 
@@ -150,6 +150,10 @@ def validate(instance, schema, path, out):
     if not isinstance(schema, dict):
         return
 
+    if "not" in schema and matches(instance, schema["not"]):
+        out.append(Finding("error", path, "value matches a forbidden schema"))
+        return
+
     if "type" in schema and not check_type(instance, schema["type"]):
         out.append(Finding("error", path, "expected type {}, got {}".format(
             schema["type"], type(instance).__name__)))
@@ -189,6 +193,11 @@ def validate(instance, schema, path, out):
                 instance, schema["maximum"])))
 
     if isinstance(instance, dict):
+        property_names = schema.get("propertyNames")
+        if isinstance(property_names, dict):
+            for key in instance:
+                child = "{}.<propertyName>".format(path) if path else "<propertyName>"
+                validate(key, property_names, child, out)
         for key in schema.get("required", []):
             if key not in instance:
                 out.append(Finding("error", path, "missing required field '{}'".format(key)))
@@ -307,7 +316,7 @@ def extract_events(doc):
     )
 
 
-def validate_document(doc, schema, check_tier_actors=False):
+def validate_document(doc, schema):
     findings = []
     events, kind = extract_events(doc)
     declared = collect_sites(doc)
@@ -323,10 +332,6 @@ def validate_document(doc, schema, check_tier_actors=False):
         validate(event, schema, path, findings)
         check_event_semantics(event, path, declared, findings)
 
-        if check_tier_actors and event.get("privacy_tier") in ("T2", "T3") and "actor_ref" in event:
-            findings.append(Finding("error", path + ".actor_ref", (
-                "actor_ref must be absent for {} when --check-tier-actors is enabled"
-            ).format(event["privacy_tier"])))
 
         event_id = event.get("event_id")
         if isinstance(event_id, str):  # a non-string id is already an error above
@@ -378,8 +383,6 @@ def main(argv=None):
     parser.add_argument("--schema", default=None,
                         help="path to kitchen-event.schema.json (found automatically in a checkout)")
     parser.add_argument("--strict", action="store_true", help="treat warnings as failures")
-    parser.add_argument("--check-tier-actors", action="store_true",
-                        help="experimental: reject actor_ref on T2/T3 Events; does not establish anonymity")
     parser.add_argument("--quiet", action="store_true", help="print only failures and the summary")
     args = parser.parse_args(argv)
 
@@ -411,7 +414,7 @@ def main(argv=None):
             continue
 
         try:
-            findings, kind, count = validate_document(doc, schema, args.check_tier_actors)
+            findings, kind, count = validate_document(doc, schema)
         except ValueError as exc:
             print("FAIL  {}\n  error    (root)                      {}".format(label, exc))
             total_errors += 1
@@ -434,12 +437,11 @@ def main(argv=None):
             for finding in findings:
                 print(finding)
 
-    print("\n{} file{} checked, {} error{}, {} warning{}{}{}".format(
+    print("\n{} file{} checked, {} error{}, {} warning{}{}".format(
         len(args.files), "" if len(args.files) == 1 else "s",
         total_errors, "" if total_errors == 1 else "s",
         total_warnings, "" if total_warnings == 1 else "s",
-        " (strict)" if args.strict else "",
-        " (tier-actor check)" if args.check_tier_actors else ""))
+        " (strict)" if args.strict else ""))
 
     return 1 if failed_files else 0
 

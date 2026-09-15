@@ -14,11 +14,11 @@ tags:
 
 # Open Kitchen Protocol: kitchen work, described together
 
-A public working draft for recording kitchen operations across people,
+A frozen public release for recording kitchen operations across people,
 robots and software agents. Start with one workflow, inspect its Events,
 and show us the meaning your implementation needs.
 
-**OKP v0.1 draft | 3 synthetic scenarios | 13 Events | Apache-2.0**
+**OKP v0.2 frozen | 3 synthetic scenarios | 13 Events | Apache-2.0**
 
 OKP can be used without an Epulo account, a CKB subscription or a proprietary
 service. [Epulo](https://epulo.ai/) stewards the project.
@@ -30,9 +30,9 @@ source of truth: specifications, validator, tests and contribution process.
 This Hugging Face dataset provides synthetic fixtures and the corresponding
 protocol snapshot for inspection and evaluation.
 
-This snapshot corresponds to reviewed GitHub commit
+This release snapshot corresponds to frozen GitHub commit
 [`{{GITHUB_SHA}}`](https://github.com/Epulo-ai/open-kitchen-protocol/tree/{{GITHUB_SHA}})
- It is a development snapshot, not a new numbered release.
+and the immutable `v0.2` tag.
 [alignment.json](alignment.json) records source paths and SHA-256 checksums.
 
 ## Explore one kitchen scenario
@@ -50,10 +50,13 @@ files are illustrative, not measurements from deployed kitchens.
 
 Other files:
 
-- [ONTOLOGY.md](ONTOLOGY.md): conceptual entities, actions and draft tier policy.
+- [ONTOLOGY.md](ONTOLOGY.md): conceptual entities, actions and v0.2 tier policy.
 - [kitchen-event.schema.json](kitchen-event.schema.json): the Event schema.
 - [docs/CONFORMANCE.md](docs/CONFORMANCE.md): current strict validation profile.
-- [docs/TIER_ACTOR_CHECK.md](docs/TIER_ACTOR_CHECK.md): the optional actor-reference check.
+- [docs/TIER_ACTOR_CHECK.md](docs/TIER_ACTOR_CHECK.md): the normative human-only actor-reference rule.
+- [docs/MIGRATION-v0.1-to-v0.2.md](docs/MIGRATION-v0.1-to-v0.2.md): breaking-change migration.
+- [docs/LEROBOT_MAPPING.md](docs/LEROBOT_MAPPING.md): LeRobot v3 annotation mapping.
+- [CHANGELOG.md](CHANGELOG.md): compatibility classification for every v0.2 change.
 - [LICENSE](LICENSE): Apache-2.0 license text.
 
 The schema and example files sit at the root of this Hugging Face repository.
@@ -76,17 +79,7 @@ Publication requires the regression tests and synthetic examples to pass the cur
 strict profile. It checks Event structure and selected consistency rules.
 It does not resolve all contextual references or prove an entire workflow.
 
-The ontology intends T2 records to omit actor references and T3 to represent
-aggregates. The synthetic fixtures still retain `actor_ref` on T2/T3 Events.
-The optional experimental check makes that known mismatch visible:
-
-```sh
-python3 tools/validate_okp.py --strict --check-tier-actors examples/*.json
-```
-
-Expected result: exit code 1, with 13 actor-reference errors, comprising
-10 T2 and 3 T3 Events. This does not change the existing strict profile or
-rewrite the files. It is one field check, not full tier enforcement.
+The v0.2 schema forbids `actor_ref` on human T2/T3 Events while retaining robot and agent references. The normal strict command enforces the rule; the v0.1 experimental flag is retired.
 
 ## Intended use and limits
 
@@ -96,7 +89,7 @@ to establish kitchen coverage, a representative benchmark, performance,
 commercial savings or production reliability.
 
 The files contain no camera streams, sensor sequences or motor trajectories.
-The LeRobot mapping is conceptual. A tested runnable converter is not included,
+The field mapping is specified in `docs/LEROBOT_MAPPING.md`. A tested runnable converter is deferred because no paired rights-cleared fixture is available,
 and these files are not presented as a ready-to-train LeRobot dataset.
 
 An Event records an operational observation. CKB is a separately developed
@@ -118,7 +111,7 @@ Epulo or anyone else access to a contributor's operational data.
 **Operators:** describe five steps and one exception, quality check or handoff
 in plain language. No coding is required.
 
-**Builders:** create a synthetic Event or report one concrete meaning the draft
+**Builders:** create a synthetic Event or report one concrete meaning v0.2
 cannot preserve. Include the exact revision, command, result and first point
 of confusion. An independently returned file is evidence of evaluation;
 sustained use is stronger evidence of adoption.

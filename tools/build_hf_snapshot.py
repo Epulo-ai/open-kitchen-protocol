@@ -11,6 +11,9 @@ FILES = {
     'schema/kitchen-event.schema.json': 'kitchen-event.schema.json',
     'docs/CONFORMANCE.md': 'docs/CONFORMANCE.md',
     'docs/TIER_ACTOR_CHECK.md': 'docs/TIER_ACTOR_CHECK.md',
+    'docs/MIGRATION-v0.1-to-v0.2.md': 'docs/MIGRATION-v0.1-to-v0.2.md',
+    'docs/LEROBOT_MAPPING.md': 'docs/LEROBOT_MAPPING.md',
+    'CHANGELOG.md': 'CHANGELOG.md',
     'examples/banqueting.example.json': 'banqueting.example.json',
     'examples/breakfast-rush.example.json': 'breakfast-rush.example.json',
     'examples/inflight.example.json': 'inflight.example.json',
@@ -39,7 +42,7 @@ def build(root, output, revision):
     entries.append({'path': 'README.md', 'github_path': 'publishing/huggingface-card.md',
                     'generated': True, 'sha256': hashlib.sha256(payloads['README.md']).hexdigest()})
     manifest = {'github_repository': 'Epulo-ai/open-kitchen-protocol',
-                'github_commit': revision, 'protocol_status': 'v0.1 working draft',
+                'github_commit': revision, 'protocol_status': 'v0.2 frozen release',
                 'dataset_repository': 'Epulo-ai/open-kitchen-protocol',
                 'records_are_synthetic': True, 'files': entries}
     payloads['alignment.json'] = (json.dumps(manifest, indent=2) + '\n').encode('utf-8')
@@ -57,4 +60,4 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     build(Path(__file__).resolve().parents[1], args.output, args.revision)
-    print('Built 10 public files at GitHub revision ' + args.revision)
+    print('Built 13 public files at GitHub revision ' + args.revision)

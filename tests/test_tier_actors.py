@@ -1,90 +1,59 @@
-"""Public CLI contract for the optional T2/T3 actor-reference check."""
-
+import copy
+import importlib.util
 import json
-import tempfile
+import os
 import unittest
-from pathlib import Path
 
-from test_validate_okp import EXAMPLES, run_validator
-
-
-def synthetic_event(tier="T2", kind="human"):
-    return {
-        "event_id": "8873a41b-6e40-4372-bd06-c865dd0d25dd",
-        "site_id": "synthetic-site",
-        "verb": "inspect",
-        "actor_kind": kind,
-        "actor_ref": "prep-role-a",
-        "session_ref": "synthetic-session",
-        "t_start": "2026-09-07T06:00:00Z",
-        "t_end": "2026-09-07T06:00:01Z",
-        "outcome": "completed",
-        "source": "manual",
-        "confidence": 0.9,
-        "privacy_tier": tier,
-    }
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SPEC = importlib.util.spec_from_file_location("validate_okp", os.path.join(ROOT, "tools", "validate_okp.py"))
+validator = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(validator)
 
 
-class TierActorCliTests(unittest.TestCase):
-    def test_existing_examples_expose_the_documented_tier_mismatch(self):
-        result = run_validator(["--strict", "--check-tier-actors"] +
-                               [str(path) for path in EXAMPLES])
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("3 files checked, 13 errors, 0 warnings", result.stdout)
-        self.assertEqual(result.stdout.count("actor_ref must be absent for T2"), 10)
-        self.assertEqual(result.stdout.count("actor_ref must be absent for T3"), 3)
+class TierActorRuleTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(ROOT, "schema", "kitchen-event.schema.json"), encoding="utf-8") as handle:
+            cls.schema = json.load(handle)
+        with open(os.path.join(ROOT, "examples", "breakfast-rush.example.json"), encoding="utf-8") as handle:
+            cls.example = json.load(handle)
 
-    def test_existing_strict_contract_is_unchanged(self):
-        for tier in ("T1", "T2", "T3"):
-            with self.subTest(tier=tier):
-                result = run_validator(["--strict", "-"], json.dumps(synthetic_event(tier)))
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                self.assertNotIn("tier-actor check", result.stdout)
+    def findings_for(self, event):
+        findings, _, _ = validator.validate_document(event, self.schema)
+        return findings
 
-    def test_opt_in_rejects_t2_t3_actor_refs_for_every_actor_kind(self):
-        for tier in ("T2", "T3"):
-            for kind in ("human", "robot", "agent"):
-                with self.subTest(tier=tier, kind=kind):
-                    result = run_validator(["--check-tier-actors", "-"],
-                                           json.dumps(synthetic_event(tier, kind)))
-                    self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-                    self.assertIn("event.actor_ref", result.stdout)
-                    self.assertIn("actor_ref must be absent for " + tier, result.stdout)
-                    self.assertIn("(tier-actor check)", result.stdout)
-                    self.assertNotIn("Traceback", result.stdout + result.stderr)
+    def test_published_examples_obey_human_only_rule(self):
+        for name in ("banqueting", "breakfast-rush", "inflight"):
+            with open(os.path.join(ROOT, "examples", name + ".example.json"), encoding="utf-8") as handle:
+                doc = json.load(handle)
+            for event in doc["events"]:
+                if event["actor_kind"] == "human" and event["privacy_tier"] in ("T2", "T3"):
+                    self.assertNotIn("actor_ref", event)
 
-    def test_opt_in_accepts_t1_actor_refs(self):
-        result = run_validator(["--strict", "--check-tier-actors", "-"],
-                               json.dumps(synthetic_event("T1")))
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    def test_human_t2_actor_ref_is_rejected(self):
+        event = copy.deepcopy(next(e for e in self.example["events"] if e["actor_kind"] == "human"))
+        event["actor_ref"] = "hot-line-a"
+        self.assertTrue(any("forbidden schema" in f.message for f in self.findings_for(event)))
 
-    def test_absent_actor_ref_passes_each_document_shape(self):
-        for tier in ("T2", "T3"):
-            event = synthetic_event(tier)
-            del event["actor_ref"]
-            for document in (event, [event], {"events": [event]}):
-                with self.subTest(tier=tier, shape=type(document).__name__):
-                    result = run_validator(["--strict", "--check-tier-actors", "-"],
-                                           json.dumps(document))
-                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    def test_robot_t2_actor_ref_is_allowed(self):
+        event = copy.deepcopy(next(e for e in self.example["events"] if e["actor_kind"] == "robot"))
+        self.assertFalse([f for f in self.findings_for(event) if f.level == "error"])
 
-    def test_human_session_requirement_still_applies(self):
-        event = synthetic_event()
-        del event["actor_ref"]
-        del event["session_ref"]
-        result = run_validator(["--check-tier-actors", "-"], json.dumps(event))
-        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("session_ref", result.stdout)
+    def test_actor_kind_is_required(self):
+        event = copy.deepcopy(self.example["events"][0])
+        event.pop("actor_kind")
+        self.assertTrue(any("actor_kind" in f.message for f in self.findings_for(event)))
 
-    def test_file_input_is_checked_without_mutation(self):
-        content = json.dumps({"events": [synthetic_event()]})
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "synthetic.json"
-            path.write_text(content, encoding="utf-8")
-            result = run_validator(["--strict", "--check-tier-actors", "--quiet", str(path)])
-            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-            self.assertIn("events[0].actor_ref", result.stdout)
-            self.assertEqual(path.read_text(encoding="utf-8"), content)
+    def test_human_t1_actor_ref_is_allowed(self):
+        event = copy.deepcopy(next(e for e in self.example["events"] if e["actor_kind"] == "human"))
+        event["privacy_tier"] = "T1"
+        event["actor_ref"] = "hot-line-a"
+        self.assertFalse([f for f in self.findings_for(event) if f.level == "error"])
+
+    def test_extension_keys_are_namespaced(self):
+        event = copy.deepcopy(self.example["events"][0])
+        event["ext"] = {"unqualified": 1}
+        self.assertTrue(any("<propertyName>" in f.path for f in self.findings_for(event)))
 
 
 if __name__ == "__main__":
