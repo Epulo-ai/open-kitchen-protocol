@@ -10,6 +10,7 @@ FILES = {
     'ONTOLOGY.md': 'ONTOLOGY.md',
     'schema/kitchen-event.schema.json': 'kitchen-event.schema.json',
     'docs/CONFORMANCE.md': 'docs/CONFORMANCE.md',
+    'docs/PILOT_WORKFLOW.md': 'docs/PILOT_WORKFLOW.md',
     'docs/TIER_ACTOR_CHECK.md': 'docs/TIER_ACTOR_CHECK.md',
     'examples/banqueting.example.json': 'banqueting.example.json',
     'examples/breakfast-rush.example.json': 'breakfast-rush.example.json',
@@ -57,4 +58,4 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     build(Path(__file__).resolve().parents[1], args.output, args.revision)
-    print('Built 10 public files at GitHub revision ' + args.revision)
+    print('Built 11 public files at GitHub revision ' + args.revision)
