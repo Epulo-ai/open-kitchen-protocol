@@ -19,7 +19,8 @@ def verify(folder):
             with urlopen(url, timeout=30) as response:
                 if response.read() != path.read_bytes():
                     raise ValueError('Published content mismatch: ' + relative)
-    message = 'Verified 10 snapshot files at Hugging Face commit ' + revision
+    count = sum(1 for path in folder.rglob('*') if path.is_file())
+    message = 'Verified {} snapshot files at Hugging Face commit {}'.format(count, revision)
     print(message)
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:

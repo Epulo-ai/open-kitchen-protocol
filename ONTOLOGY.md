@@ -1,102 +1,73 @@
-# OKP Ontology — v0.1 DRAFT
+# OKP Ontology — frozen v0.2
 
-This document defines the conceptual model. The machine-readable form lives in `schema/`.
+This document defines the conceptual model. The machine-readable Event is
+`schema/kitchen-event.schema.json`, whose top-level `version` is `0.2`.
 
-## 1. Design principles
+## Design principles
 
-1. **Operator-first.** Concepts map to how kitchens are actually run (stations, shifts, covers, mise en place), not to how software engineers imagine them.
-2. **Actor-agnostic.** A task is the same task whether a human, a robot arm or a software agent performs it. Automation readiness becomes measurable instead of ideological.
-3. **Privacy-oriented representation.** Human actor references use pseudonymous role tokens. Context and linked records still require appropriate controls; the schema alone cannot establish anonymity.
-4. **Composable.** Sites contain stations; recipes decompose into tasks; tasks decompose into actions. Every level can be recorded independently.
-5. **Interoperable.** Events map cleanly onto robot-learning episode formats (see section 7).
+Operator-first, actor-agnostic, privacy-oriented, composable and interoperable.
+Human references are pseudonymous at T1 and absent at T2/T3, but context and
+linked records still require appropriate controls.
 
-## 2. Core entities
+## Core entities
 
-| Entity | Definition | Key fields |
-|---|---|---|
-| `Site` | One physical operation | site_id, format (motorway, airport, hospital, qsr, ghost, canteen), country, daypart_profile |
-| `Station` | A functional work position within a site | station_id, type (prep, hot, cold, fry, grill, assembly, pass, dish, storage, service), equipment[] |
-| `Equipment` | A machine or tool, human-operated or autonomous | equipment_id, class, vendor, autonomy_level (0 manual … 4 autonomous), capabilities[] |
-| `Actor` | Any performer of work | actor_id (pseudonymous token), kind (human, robot, agent), role (e.g. line, lead, runner), consent_scope |
-| `Ingredient` | A material input | ingredient_id, name, category, unit, allergens[], storage_class, external_refs (GS1/GTIN, LanguaL, FoodOn) |
-| `Product` | A sellable output | product_id, name, menu_category, target_time_s, recipe_ref |
-| `Recipe` | A directed process graph producing a Product | recipe_id, steps[] (each step = Task template), yield, critical_points[] (HACCP) |
-| `Task` | A unit of work with a purpose | task_id, verb (see taxonomy), object, station, nominal_duration_s, skill_level, automation_readiness (0–5) |
-| `Order` | A demand event | order_id, products[], channel, placed_at, promised_at |
-| `Shift` | A staffing period | shift_id, site, start, end, planned_actors, unfilled_positions |
-| `ServiceContext` | A bounded service occasion that groups events: one banquet, one flight leg, one ward round | service_context_ref, type (banquet, flight_leg, ward_round, event_catering, a_la_carte), covers, scheduled_start |
-| `RecordingSession` | A bounded period of data capture involving human actors, and the consent under which it happened | session_ref, consent_scope, workforce_agreement_ref (works council, union or local equivalent; null where not applicable), retention_days, privacy_tier |
-| `Event` | A timestamped observation | see section 4 |
+`Site`, `Station`, `Equipment`, `Actor`, `Ingredient`, `Product`, `Recipe`,
+`Task`, `Order`, `Shift`, `ServiceContext`, `RecordingSession` and `Event`.
+The repository examples specify the v0.2 episode envelope in practice: an
+`events` array plus optional descriptive context (`okp_version`, `description`,
+`note`, `site` or `sites`, and `service_context`). Envelope objects are context,
+not validated entities in v0.2; a machine-readable envelope schema and
+reference-resolution profile are deferred because incomplete resolution rules
+would create false assurance.
 
-## 3. Action taxonomy
-
-Tasks use a controlled verb set, grouped in six families. The set is deliberately small in v0.1; extension happens through `variant` qualifiers, not new verbs.
+## Frozen action taxonomy
 
 - **PREP** — wash, peel, cut, portion, mix, marinate, weigh
-- **THERMAL** — fry, grill, bake, boil, steam, sauté, hold_hot, chill, regenerate
+- **THERMAL** — fry, grill, bake, boil, steam, saute, hold_hot, chill, regenerate
 - **ASSEMBLE** — plate, wrap, garnish, pack, combine
 - **LOGISTICS** — transport, restock, receive, store, retrieve, dispose
 - **HYGIENE** — clean_surface, clean_equipment, wash_dishes, sanitize, handwash_cycle
 - **CONTROL** — check_temp, check_stock, taste, inspect, document, handover
 
-Each verb carries: typical duration distribution, required capabilities, hazard class, and an **automation_readiness** score (0 = no known automation, 5 = routinely automated in production). This score is where the dataset becomes a market map: it shows every vendor where the open territory is.
+`saute` is the wire spelling; prose may render “sauté”. The family mapping is
+specified above. Typical-duration distributions, required-capability sets,
+hazard classes and automation-readiness scores are deferred: v0.1 claimed each
+verb carried them but published no evidence or values, and v0.2 does not invent
+scored metadata.
 
-## 4. Event model
+## Event model
 
-The Event is the atomic record. Everything else provides context for it.
+Every Event requires `event_id`, `site_id`, `actor_kind`, `verb`, `t_start`,
+`outcome`, `source`, `confidence` and `privacy_tier`. `verb` is always required;
+`task_ref` is optional context, not an alternative to it. Human Events require
+`session_ref`. Human T2/T3 Events forbid `actor_ref`. See the schema for fields
+and vocabularies. `ext` is the only vendor-extension point and uses
+reverse-domain keys.
 
-```
-Event {
-  event_id, site_id, station_id,
-  actor_ref,            // pseudonymous
-  task_ref | verb,      // what was done
-  service_context_ref,  // the service occasion this event belongs to, where one applies
-  object_refs[],        // ingredients/products/equipment involved
-  t_start, t_end,       // ISO 8601
-  outcome,              // completed | interrupted | failed | rework
-  measures{},           // temp_c, weight_g, count, distance_m, energy_wh …
-  quality_flags[],      // e.g. haccp_deviation, spill, near_miss
-  source,               // pos | sensor | vision | manual | robot_log | agent
-  confidence,            // 0–1, honesty about data provenance
-  privacy_tier,         // T1 | T2 | T3, T0 never leaves the site
-  session_ref           // required whenever actor_kind is human
-}
-```
+## Privacy tiers
 
-Design choices worth defending:
+| Tier | Content | Exchange policy |
+| --- | --- | --- |
+| T0 | Raw sensor/vision streams | Never represented by this Event schema; process and delete on site. |
+| T1 | Events with pseudonymous human actor tokens | Only under operator data agreement. |
+| T2 | Sessionized Events; human `actor_ref` absent | Shareable only under an applicable licence and controls. |
+| T3 | Intended for aggregates; human `actor_ref` absent | Publication still requires rights and an aggregate profile. |
 
-- **`source` and `confidence` are mandatory.** A POS timestamp, a vision-derived estimate and a manual entry are not equally trustworthy, and the schema refuses to pretend otherwise.
-- **`outcome: rework`** exists because rework is where kitchens lose money and where nobody currently measures anything.
-- **Aggregation levels.** Events can be recorded raw (robot logs), sessionized (per order), or aggregated (per station per 15 min). The privacy tier determines which levels may leave the site.
+The schema enforces only the stated Event-field rules. It does not resolve
+RecordingSession consent/agreement/retention data or establish anonymity.
+T3 aggregate shape, suppression and precision are deferred beyond v0.2.
 
-## 5. Derived measures (the operator dividend)
+## LeRobot v3 mapping
 
-From events alone, without any additional instrumentation, OKP data yields: cost per cover, station cycle times, thermal energy per product, waste ratio by cause, unfilled-hour coverage, order-to-pass latency, rework rate, and HACCP compliance evidence as a by-product. This is deliberate: the operator gets a management dividend from day one, which is what makes data collection politically survivable on the floor.
+`docs/LEROBOT_MAPPING.md` specifies the field mapping. A runnable converter is
+deferred until a paired, rights-cleared OKP + LeRobot fixture exists because
+OKP carries no frame-level sensorimotor data.
 
-## 6. Privacy tiers (draft policy and implementation status)
+## Explicitly out of scope for v0.2
 
-| Tier | Content | Leaves the site? |
-|---|---|---|
-| T0 | Raw sensor/vision streams | Never. Processed and deleted on-site. |
-| T1 | Events with pseudonymous actor tokens | Only under operator data agreement |
-| T2 | Sessionized events, actor field removed | Shareable under license |
-| T3 | Aggregates (station × daypart) | Publishable / open |
-
-These are intended tier policies, not properties established by an Event schema pass. The current synthetic T2/T3 examples retain actor references. The optional [tier actor-reference check](docs/TIER_ACTOR_CHECK.md) detects that mismatch without changing the existing strict profile. T3 aggregation and other reference-linkage rules remain to be specified and implemented. Tier labels alone do not grant sharing or publication rights.
-
-Consent scope, workforce-agreement reference and retention period are conceptual RecordingSession fields. The Event schema requires `session_ref` when `actor_kind` is `human`; current tooling does not resolve the referenced session or verify those fields. It must not be described as enforcing consent or preventing capture when session metadata is absent.
-
-## 7. Robot-learning mapping (LeRobot compatibility)
-
-An OKP Event maps to an episode annotation: `verb` + `object_refs` become task labels, `t_start/t_end` bound the episode, `measures` and `outcome` become success signals, `Station.equipment` describes embodiment. A conformance note and converter stub will live in `tools/` from v0.2. The goal: any robot vendor can train against OKP-labeled data without ever seeing tier T0/T1 material.
-
-## 8. What v0.1 deliberately excludes
-
-Nutrition claims, dynamic pricing, employee performance scoring (explicitly out of scope and incompatible with section 6), and consumer-facing data. Scope discipline is a feature.
-
-## 9. Open questions for contributors
-
-1. Is the six-family verb taxonomy sufficient for non-European formats (wok lines, sushi lines)?
-2. Should `automation_readiness` be centrally maintained or crowd-scored?
-3. Which existing food ontologies (FoodOn, LanguaL, GS1) should be normative references vs. optional mappings?
-4. Where should structured culinary methodology (technique-level knowledge) attach: at Recipe, at Task, or as its own entity?
+Nutrition, procurement, scheduling, dynamic pricing, employee performance
+scoring, consumer-facing data, normative external food-ontology bindings, and
+structured culinary methodology. The v0.1 questions about non-European
+taxonomy coverage, readiness-score governance, FoodOn/LanguaL/GS1 status and
+culinary-method placement remain research questions, not hidden planned
+features or normative v0.2 requirements.
