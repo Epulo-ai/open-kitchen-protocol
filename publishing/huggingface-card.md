@@ -53,6 +53,7 @@ Other files:
 - [ONTOLOGY.md](ONTOLOGY.md): conceptual entities, actions and draft tier policy.
 - [kitchen-event.schema.json](kitchen-event.schema.json): the Event schema.
 - [docs/CONFORMANCE.md](docs/CONFORMANCE.md): current strict validation profile.
+- [docs/PILOT_WORKFLOW.md](docs/PILOT_WORKFLOW.md): rights-cleared pilot and coding-agent handoff workflow.
 - [docs/TIER_ACTOR_CHECK.md](docs/TIER_ACTOR_CHECK.md): the optional actor-reference check.
 - [LICENSE](LICENSE): Apache-2.0 license text.
 

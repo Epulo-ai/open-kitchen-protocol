@@ -51,3 +51,9 @@ Hugging Face examples should identify the GitHub release or commit they match.
 Publishing datasets and demos is a separate step from changing the protocol.
 Do not upload customer data or imply robot-learning compatibility merely from
 an event label or a successful schema check.
+
+For a staged demonstration, including a bounded prompt for Codex, Claude Code
+or another coding agent, follow the
+[rights-cleared pilot workflow](PILOT_WORKFLOW.md). GitHub remains the source
+of truth; reviewed changes reach the managed Hugging Face snapshot only through
+its validation and publication workflow.

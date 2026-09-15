@@ -6,6 +6,9 @@ from tools.build_hf_snapshot import build, FILES
 ROOT = Path(__file__).resolve().parents[1]
 SHA = 'a' * 40
 class SnapshotTests(unittest.TestCase):
+    def test_pilot_workflow_is_in_public_allowlist(self):
+        self.assertEqual(FILES['docs/PILOT_WORKFLOW.md'], 'docs/PILOT_WORKFLOW.md')
+
     def test_exact_allowlist_hashes_and_revision(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / 'snapshot'

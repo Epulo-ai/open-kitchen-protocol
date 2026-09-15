@@ -18,13 +18,13 @@ obsolete revisions are skipped. If main changes during upload, the next
 successful run publishes the newer snapshot.
 
 `tools/build_hf_snapshot.py` defines the exact public allowlist. The schema and
-three existing synthetic fixtures go to HF's root; two notes retain `docs/`.
+three existing synthetic fixtures go to HF's root; three notes retain `docs/`.
 The HF card template is `publishing/huggingface-card.md`; its revision placeholder
 is rendered each run. Update counts and limitations when fixtures or validation
 change. `alignment.json` records the source commit and checksums. These are
 development snapshots, not numbered protocol releases.
 
-Only ten files are written. Existing unrelated HF files are not deleted. New
+Only eleven files are written. Existing unrelated HF files are not deleted. New
 GitHub files are not automatically published: review suitability, then update
 the builder, card and tests. Private CKB, customer and commercial data must
 remain outside this list. OKP requires neither Epulo nor a CKB subscription.

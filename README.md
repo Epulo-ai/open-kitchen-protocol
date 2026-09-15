@@ -35,6 +35,7 @@ OKP uses pseudonymous actor references and describes tiers for handling kitchen 
 - `examples/banqueting.example.json` — a synthetic banqueting service across multiple sites, long-duration prep tasks
 - `examples/inflight.example.json` — a synthetic inflight catering run, high-count tray-line production
 - `docs/CONFORMANCE.md` — the provisional strict validation profile and its limits
+- `docs/PILOT_WORKFLOW.md` — a rights-cleared pilot and coding-agent handoff workflow
 
 ## Independent quickstart
 
