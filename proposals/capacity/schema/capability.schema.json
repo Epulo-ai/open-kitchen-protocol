@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://okp.epulo.ai/proposals/capacity/schema/capability.schema.json",
+  "title": "OKP Capability (proposal)",
+  "description": "What a site can produce at all: items, the variants it makes them in, and an explicit allergen state for each. PROPOSAL 0.1-draft. This is not part of OKP v0.2, it is not ratified, and it is not stable to build against.",
+  "type": "object",
+  "required": [
+    "object",
+    "okp_capacity_version",
+    "site_id",
+    "issued_at",
+    "valid_until",
+    "accountable_party",
+    "fulfilment_modes",
+    "items"
+  ],
+  "properties": {
+    "object": {
+      "const": "capability"
+    },
+    "okp_capacity_version": {
+      "const": "0.1-draft",
+      "description": "Self-identification of the proposal revision. A consumer that does not know this value MUST refuse the document rather than interpret it."
+    },
+    "site_id": {
+      "type": "string",
+      "description": "The same site identifier namespace OKP Events use, so a promise and the Events that report against it name one site."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "A capability document that never expires is a claim nobody re-checks. Re-issue rather than extend."
+    },
+    "accountable_party": {
+      "type": "object",
+      "description": "Who is answerable for what this site produces. The food business operator, a legal entity, never an employee.",
+      "required": [
+        "party_id",
+        "legal_name",
+        "role",
+        "contact_ref"
+      ],
+      "properties": {
+        "party_id": {
+          "type": "string"
+        },
+        "legal_name": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "operator",
+            "site",
+            "aggregator",
+            "platform",
+            "other"
+          ]
+        },
+        "contact_ref": {
+          "type": "string",
+          "description": "Where a broken promise is reported. A URL or a mailto. Not resolved by this proposal."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2, the jurisdiction whose food law the accountable party answers under."
+        }
+      },
+      "additionalProperties": false
+    },
+    "fulfilment_modes": {
+      "type": "array",
+      "description": "How produced units leave the site. Declared once per site, narrowed per offer.",
+      "items": {
+        "enum": [
+          "on_site",
+          "collection",
+          "delivery",
+          "room_service"
+        ]
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_id",
+          "variants"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+            "description": "The operator's own identifier for something the caller can already name. This proposal mints no catalogue keys and carries no menu."
+          },
+          "label": {
+            "type": "string",
+            "description": "Optional short string for logs and human review. Not a menu description, not display copy; no consumer may depend on it."
+          },
+          "refs": {
+            "type": "object",
+            "description": "Optional identifiers the same item carries elsewhere: a POS id, a GTIN, a recipe reference. Values are strings and are not resolved here.",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "variants": {
+            "type": "array",
+            "description": "At least one. Use variant_id 'standard' where a site makes the item exactly one way.",
+            "items": {
+              "type": "object",
+              "required": [
+                "variant_id",
+                "unit",
+                "lead_time_s",
+                "allergen_profile"
+              ],
+              "properties": {
+                "variant_id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "unit": {
+                  "enum": [
+                    "portion",
+                    "cover",
+                    "tray",
+                    "pack",
+                    "litre",
+                    "kilogram"
+                  ]
+                },
+                "lead_time_s": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Typical seconds from an accepted order to ready, for one unit, with the line otherwise idle. This is capability, not capacity: it says nothing about current load."
+                },
+                "allergen_profile": {
+                  "type": "object",
+                  "required": [
+                    "scheme",
+                    "assessed_at",
+                    "declared"
+                  ],
+                  "properties": {
+                    "scheme": {
+                      "const": "eu-fic-1169-2011",
+                      "description": "Annex II of Regulation (EU) 1169/2011, the fourteen declarable allergens. A site outside the EU may use it; this proposal defines no second scheme."
+                    },
+                    "assessed_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "assessment_ref": {
+                      "type": "string",
+                      "description": "Reference to the assessment record behind these states. Not resolved by this proposal."
+                    },
+                    "declared": {
+                      "type": "object",
+                      "description": "Every allergen in the scheme MUST carry an explicit state. A missing key is not 'absent', and this schema does not let the question go unanswered.",
+                      "required": [
+                        "gluten",
+                        "crustaceans",
+                        "eggs",
+                        "fish",
+                        "peanuts",
+                        "soybeans",
+                        "milk",
+                        "tree_nuts",
+                        "celery",
+                        "mustard",
+                        "sesame",
+                        "sulphites",
+                        "lupin",
+                        "molluscs"
+                      ],
+                      "properties": {
+                        "gluten": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "crustaceans": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "eggs": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "fish": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "peanuts": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "soybeans": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "milk": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "tree_nuts": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "celery": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "mustard": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "sesame": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "sulphites": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "lupin": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        },
+                        "molluscs": {
+                          "enum": [
+                            "present",
+                            "absent",
+                            "may_contain",
+                            "unknown"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "ext": {
+                  "type": "object",
+                  "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer.",
+                  "propertyNames": {
+                    "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "ext": {
+            "type": "object",
+            "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer.",
+            "propertyNames": {
+              "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "ext": {
+      "type": "object",
+      "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer. A payment or authorisation protocol's object is referenced here under its own key; this proposal defines no payment field.",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "status": "proposal",
+  "version": "0.1-draft"
+}

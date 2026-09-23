@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://okp.epulo.ai/proposals/capacity/schema/commitment-outcome.schema.json",
+  "title": "OKP Commitment Outcome (proposal)",
+  "description": "What became of a commitment, reported back by the site that made it, and linked to the OKP Events that evidence it. The return path: a promise nobody closes is not a promise. PROPOSAL 0.1-draft. This is not part of OKP v0.2, it is not ratified, and it is not stable to build against.",
+  "type": "object",
+  "required": [
+    "object",
+    "okp_capacity_version",
+    "outcome_id",
+    "site_id",
+    "commitment_ref",
+    "result",
+    "units_promised",
+    "units_delivered",
+    "promised_window",
+    "reported_at",
+    "accountable_party"
+  ],
+  "properties": {
+    "object": {
+      "const": "commitment_outcome"
+    },
+    "okp_capacity_version": {
+      "const": "0.1-draft"
+    },
+    "outcome_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "site_id": {
+      "type": "string"
+    },
+    "commitment_ref": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "result": {
+      "enum": [
+        "met",
+        "met_late",
+        "partially_met",
+        "not_met",
+        "cancelled_by_requester",
+        "cancelled_by_site"
+      ]
+    },
+    "units_promised": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "units_delivered": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "promised_window": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "actual_ready_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the units were actually ready. Required for met_late."
+    },
+    "reported_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reason": {
+      "enum": [
+        "equipment_fault",
+        "ingredient_shortage",
+        "staffing_shortfall",
+        "demand_surge",
+        "safety_hold",
+        "upstream_delay",
+        "requester_cancelled",
+        "other"
+      ],
+      "description": "A category, never a person. 'staffing_shortfall' says a shift was short, not who was missing."
+    },
+    "reason_note": {
+      "type": "string",
+      "description": "Optional free text. MUST NOT name a person or carry a personnel number."
+    },
+    "remedy_applied": {
+      "enum": [
+        "substitute_offered",
+        "rebooked",
+        "released_without_charge",
+        "none"
+      ],
+      "description": "What the site actually did, which may differ from what it undertook to do in the commitment's on_failure."
+    },
+    "event_refs": {
+      "type": "array",
+      "description": "OKP Event ids evidencing what happened. This is the join between the forward record and the past-tense protocol; an unmet promise with no Events behind it is an assertion.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "accountable_party": {
+      "type": "object",
+      "required": [
+        "party_id",
+        "legal_name",
+        "role",
+        "contact_ref"
+      ],
+      "properties": {
+        "party_id": {
+          "type": "string"
+        },
+        "legal_name": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "operator",
+            "site",
+            "aggregator",
+            "platform",
+            "other"
+          ]
+        },
+        "contact_ref": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ext": {
+      "type": "object",
+      "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer.",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": [
+              "met_late",
+              "partially_met",
+              "not_met",
+              "cancelled_by_requester",
+              "cancelled_by_site"
+            ]
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "enum": [
+              "met_late",
+              "partially_met",
+              "not_met",
+              "cancelled_by_site"
+            ]
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "required": [
+          "remedy_applied"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "met_late"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "then": {
+        "required": [
+          "actual_ready_at"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "status": "proposal",
+  "version": "0.1-draft"
+}

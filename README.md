@@ -23,6 +23,10 @@ are outside this release.
 - `docs/LEROBOT_MAPPING.md` — LeRobot v3 annotation mapping and converter deferral
 - `CHANGELOG.md` — release-by-release compatibility record
 
+**Proposals.** `proposals/capacity/` drafts a forward counterpart to the Event
+record: what a kitchen can produce next, and a commitment someone honours. It is a
+proposal, not part of v0.2 and not ratified. Comments welcome.
+
 ## Validate independently
 
 ```sh

@@ -1,0 +1,97 @@
+{
+  "description": "Synthetic OKP capacity proposal sample: a corporate canteen commits to a tray order, an oven fault takes out half the batch, and the site reports the shortfall itself with the OKP Events that evidence it. The case the extension exists for. All data invented for illustration. Draft 0.1, not a ratified standard.",
+  "documents": [
+    {
+      "object": "capacity_offer",
+      "okp_capacity_version": "0.1-draft",
+      "offer_id": "5d20b8a4-0000-4000-8000-000000000101",
+      "site_id": "site-ch-zrh-canteen-004",
+      "item_id": "tray.vegetarian.lasagne",
+      "variant_id": "standard",
+      "unit": "tray",
+      "fulfilment_mode": "delivery",
+      "window": {
+        "from": "2026-09-21T10:30:00Z",
+        "to": "2026-09-21T11:00:00Z"
+      },
+      "available_units": 8,
+      "basis": "measured",
+      "confidence": 0.91,
+      "issued_at": "2026-09-20T14:02:00Z",
+      "expires_at": "2026-09-20T14:32:00Z",
+      "price": {
+        "amount": 74.0,
+        "currency": "CHF"
+      },
+      "constraints": {
+        "min_units": 2,
+        "max_units": 8,
+        "order_by": "2026-09-21T06:00:00Z"
+      }
+    },
+    {
+      "object": "commitment",
+      "okp_capacity_version": "0.1-draft",
+      "commitment_id": "5d20b8a4-0000-4000-8000-000000000201",
+      "site_id": "site-ch-zrh-canteen-004",
+      "offer_ref": "5d20b8a4-0000-4000-8000-000000000101",
+      "state": "failed",
+      "item_id": "tray.vegetarian.lasagne",
+      "variant_id": "standard",
+      "units": 6,
+      "unit": "tray",
+      "fulfilment_mode": "delivery",
+      "window": {
+        "from": "2026-09-21T10:30:00Z",
+        "to": "2026-09-21T11:00:00Z"
+      },
+      "held_at": "2026-09-20T14:05:00Z",
+      "expires_at": "2026-09-20T14:20:00Z",
+      "confirmed_at": "2026-09-20T14:07:30Z",
+      "requester_ref": "agent-corr-2d8f01",
+      "accountable_party": {
+        "party_id": "party-ch-004",
+        "legal_name": "Betriebsgastronomie Limmattal AG",
+        "role": "operator",
+        "contact_ref": "https://example.invalid/zrh-004/commitments",
+        "jurisdiction": "CH"
+      },
+      "on_failure": {
+        "remedy": "substitute_offered",
+        "notice_min_s": 3600,
+        "notice_ref": "https://example.invalid/zrh-004/notice"
+      }
+    },
+    {
+      "object": "commitment_outcome",
+      "okp_capacity_version": "0.1-draft",
+      "outcome_id": "5d20b8a4-0000-4000-8000-000000000301",
+      "site_id": "site-ch-zrh-canteen-004",
+      "commitment_ref": "5d20b8a4-0000-4000-8000-000000000201",
+      "result": "partially_met",
+      "units_promised": 6,
+      "units_delivered": 3,
+      "promised_window": {
+        "from": "2026-09-21T10:30:00Z",
+        "to": "2026-09-21T11:00:00Z"
+      },
+      "actual_ready_at": "2026-09-21T10:52:00Z",
+      "reported_at": "2026-09-21T11:04:00Z",
+      "reason": "equipment_fault",
+      "reason_note": "combi oven two lost heating mid-cycle; the second batch could not be regenerated in the window",
+      "remedy_applied": "substitute_offered",
+      "event_refs": [
+        "5d20b8a4-0000-4000-8000-0000000004a1",
+        "5d20b8a4-0000-4000-8000-0000000004a2",
+        "5d20b8a4-0000-4000-8000-0000000004a3"
+      ],
+      "accountable_party": {
+        "party_id": "party-ch-004",
+        "legal_name": "Betriebsgastronomie Limmattal AG",
+        "role": "operator",
+        "contact_ref": "https://example.invalid/zrh-004/commitments",
+        "jurisdiction": "CH"
+      }
+    }
+  ]
+}

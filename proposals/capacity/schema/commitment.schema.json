@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://okp.epulo.ai/proposals/capacity/schema/commitment.schema.json",
+  "title": "OKP Commitment (proposal)",
+  "description": "A hold against a capacity offer, with an explicit expiry and a stated remedy for the case where it cannot be met. PROPOSAL 0.1-draft. This is not part of OKP v0.2, it is not ratified, and it is not stable to build against.",
+  "type": "object",
+  "required": [
+    "object",
+    "okp_capacity_version",
+    "commitment_id",
+    "site_id",
+    "offer_ref",
+    "state",
+    "item_id",
+    "variant_id",
+    "units",
+    "unit",
+    "fulfilment_mode",
+    "window",
+    "held_at",
+    "expires_at",
+    "accountable_party",
+    "on_failure"
+  ],
+  "properties": {
+    "object": {
+      "const": "commitment"
+    },
+    "okp_capacity_version": {
+      "const": "0.1-draft"
+    },
+    "commitment_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "site_id": {
+      "type": "string"
+    },
+    "offer_ref": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The offer_id this commitment was taken against. References are not resolved by this proposal."
+    },
+    "state": {
+      "enum": [
+        "held",
+        "confirmed",
+        "released",
+        "expired",
+        "fulfilled",
+        "failed"
+      ],
+      "description": "held -> confirmed -> fulfilled or failed. released is a deliberate cancellation by either side; expired is a hold nobody confirmed."
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$"
+    },
+    "variant_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"
+    },
+    "units": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unit": {
+      "enum": [
+        "portion",
+        "cover",
+        "tray",
+        "pack",
+        "litre",
+        "kilogram"
+      ]
+    },
+    "fulfilment_mode": {
+      "enum": [
+        "on_site",
+        "collection",
+        "delivery",
+        "room_service"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "description": "The promised window. Must fall inside the offer's window.",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "held_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When an unconfirmed hold lapses and the units return to the site. Required in every state: a hold that does not expire is capacity nobody owns."
+    },
+    "confirmed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Required once the state is confirmed, fulfilled or failed."
+    },
+    "accountable_party": {
+      "type": "object",
+      "description": "Who is answerable if this promise is not met. A legal entity, never an employee.",
+      "required": [
+        "party_id",
+        "legal_name",
+        "role",
+        "contact_ref"
+      ],
+      "properties": {
+        "party_id": {
+          "type": "string"
+        },
+        "legal_name": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "operator",
+            "site",
+            "aggregator",
+            "platform",
+            "other"
+          ]
+        },
+        "contact_ref": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "on_failure": {
+      "type": "object",
+      "description": "What happens when the commitment cannot be met. Stated when the promise is made, not discovered afterwards.",
+      "required": [
+        "remedy",
+        "notice_min_s"
+      ],
+      "properties": {
+        "remedy": {
+          "enum": [
+            "substitute_offered",
+            "rebooked",
+            "released_without_charge",
+            "none_stated"
+          ],
+          "description": "'none_stated' is representable on purpose. A site may promise nothing, and a consumer may then refuse the hold; what it may not do is leave the question unanswered."
+        },
+        "notice_min_s": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Seconds of notice the site undertakes to give before the window, once it knows it will miss. Zero means no undertaking."
+        },
+        "notice_ref": {
+          "type": "string",
+          "description": "Where that notice is sent. Absent means the requester polls."
+        }
+      },
+      "additionalProperties": false
+    },
+    "requester_ref": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+      "description": "Opaque token the caller supplies to correlate its own records. MUST NOT encode a name, account, email address, phone number or payment reference. This proposal carries no identity."
+    },
+    "ext": {
+      "type": "object",
+      "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer. A payment authorisation is referenced here under the payment protocol's own key.",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "confirmed",
+              "fulfilled",
+              "failed"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "confirmed_at"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "held"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "confirmed_at"
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "status": "proposal",
+  "version": "0.1-draft"
+}
