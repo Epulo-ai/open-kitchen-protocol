@@ -1,0 +1,174 @@
+{
+  "description": "Synthetic OKP capacity proposal sample: a hotel room-service kitchen answers an ordering agent for a late-evening window, is held, confirms, and reports the promise met. All data invented for illustration. Draft 0.1, not a ratified standard.",
+  "documents": [
+    {
+      "object": "capability",
+      "okp_capacity_version": "0.1-draft",
+      "site_id": "site-nl-ams-hotel-021",
+      "issued_at": "2026-09-18T15:00:00Z",
+      "valid_until": "2026-09-19T03:00:00Z",
+      "accountable_party": {
+        "party_id": "party-nl-021",
+        "legal_name": "Hotelexploitatie Amstelzijde B.V.",
+        "role": "operator",
+        "contact_ref": "https://example.invalid/ams-021/service-issues",
+        "jurisdiction": "NL"
+      },
+      "fulfilment_modes": [
+        "room_service",
+        "on_site"
+      ],
+      "items": [
+        {
+          "item_id": "club-sandwich",
+          "label": "club sandwich",
+          "refs": {
+            "pos_id": "4412"
+          },
+          "variants": [
+            {
+              "variant_id": "standard",
+              "unit": "portion",
+              "lead_time_s": 720,
+              "allergen_profile": {
+                "scheme": "eu-fic-1169-2011",
+                "assessed_at": "2026-08-30T09:12:00Z",
+                "assessment_ref": "assessment-2026-08-club-sandwich",
+                "declared": {
+                  "gluten": "present",
+                  "crustaceans": "absent",
+                  "eggs": "present",
+                  "fish": "absent",
+                  "peanuts": "absent",
+                  "soybeans": "may_contain",
+                  "milk": "present",
+                  "tree_nuts": "absent",
+                  "celery": "absent",
+                  "mustard": "present",
+                  "sesame": "may_contain",
+                  "sulphites": "absent",
+                  "lupin": "absent",
+                  "molluscs": "absent"
+                }
+              }
+            },
+            {
+              "variant_id": "gluten-free-bread",
+              "unit": "portion",
+              "lead_time_s": 900,
+              "allergen_profile": {
+                "scheme": "eu-fic-1169-2011",
+                "assessed_at": "2026-08-30T09:20:00Z",
+                "assessment_ref": "assessment-2026-08-club-sandwich-gf",
+                "declared": {
+                  "gluten": "may_contain",
+                  "crustaceans": "absent",
+                  "eggs": "present",
+                  "fish": "absent",
+                  "peanuts": "absent",
+                  "soybeans": "may_contain",
+                  "milk": "present",
+                  "tree_nuts": "absent",
+                  "celery": "absent",
+                  "mustard": "present",
+                  "sesame": "may_contain",
+                  "sulphites": "absent",
+                  "lupin": "absent",
+                  "molluscs": "absent"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "capacity_offer",
+      "okp_capacity_version": "0.1-draft",
+      "offer_id": "8a1d4f60-0000-4000-8000-000000000101",
+      "site_id": "site-nl-ams-hotel-021",
+      "item_id": "club-sandwich",
+      "variant_id": "standard",
+      "unit": "portion",
+      "fulfilment_mode": "room_service",
+      "window": {
+        "from": "2026-09-18T22:00:00Z",
+        "to": "2026-09-18T22:30:00Z"
+      },
+      "available_units": 6,
+      "basis": "measured",
+      "confidence": 0.86,
+      "issued_at": "2026-09-18T21:34:00Z",
+      "expires_at": "2026-09-18T21:44:00Z",
+      "price": {
+        "amount": 21.5,
+        "currency": "EUR"
+      },
+      "constraints": {
+        "min_units": 1,
+        "max_units": 4,
+        "order_by": "2026-09-18T21:46:00Z"
+      }
+    },
+    {
+      "object": "commitment",
+      "okp_capacity_version": "0.1-draft",
+      "commitment_id": "8a1d4f60-0000-4000-8000-000000000201",
+      "site_id": "site-nl-ams-hotel-021",
+      "offer_ref": "8a1d4f60-0000-4000-8000-000000000101",
+      "state": "fulfilled",
+      "item_id": "club-sandwich",
+      "variant_id": "standard",
+      "units": 2,
+      "unit": "portion",
+      "fulfilment_mode": "room_service",
+      "window": {
+        "from": "2026-09-18T22:05:00Z",
+        "to": "2026-09-18T22:25:00Z"
+      },
+      "held_at": "2026-09-18T21:36:10Z",
+      "expires_at": "2026-09-18T21:41:10Z",
+      "confirmed_at": "2026-09-18T21:37:02Z",
+      "requester_ref": "agent-corr-7f3b2c",
+      "accountable_party": {
+        "party_id": "party-nl-021",
+        "legal_name": "Hotelexploitatie Amstelzijde B.V.",
+        "role": "operator",
+        "contact_ref": "https://example.invalid/ams-021/service-issues",
+        "jurisdiction": "NL"
+      },
+      "on_failure": {
+        "remedy": "released_without_charge",
+        "notice_min_s": 300,
+        "notice_ref": "https://example.invalid/ams-021/commitments/notice"
+      }
+    },
+    {
+      "object": "commitment_outcome",
+      "okp_capacity_version": "0.1-draft",
+      "outcome_id": "8a1d4f60-0000-4000-8000-000000000301",
+      "site_id": "site-nl-ams-hotel-021",
+      "commitment_ref": "8a1d4f60-0000-4000-8000-000000000201",
+      "result": "met",
+      "units_promised": 2,
+      "units_delivered": 2,
+      "promised_window": {
+        "from": "2026-09-18T22:05:00Z",
+        "to": "2026-09-18T22:25:00Z"
+      },
+      "actual_ready_at": "2026-09-18T22:17:40Z",
+      "reported_at": "2026-09-18T22:26:00Z",
+      "event_refs": [
+        "8a1d4f60-0000-4000-8000-0000000004a1",
+        "8a1d4f60-0000-4000-8000-0000000004a2"
+      ],
+      "accountable_party": {
+        "party_id": "party-nl-021",
+        "legal_name": "Hotelexploitatie Amstelzijde B.V.",
+        "role": "operator",
+        "contact_ref": "https://example.invalid/ams-021/service-issues",
+        "jurisdiction": "NL"
+      }
+    }
+  ]
+}

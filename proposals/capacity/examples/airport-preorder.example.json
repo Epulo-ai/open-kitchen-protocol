@@ -1,0 +1,122 @@
+{
+  "description": "Synthetic OKP capacity proposal sample: an airside kitchen answers a pre-order agent for a landing-time window. The capacity number is modelled rather than measured and says so, one allergen state is honestly unknown, and the hold is still open. All data invented for illustration. Draft 0.1, not a ratified standard.",
+  "documents": [
+    {
+      "object": "capability",
+      "okp_capacity_version": "0.1-draft",
+      "site_id": "site-de-fra-t1-008",
+      "issued_at": "2026-09-19T04:00:00Z",
+      "valid_until": "2026-09-19T22:00:00Z",
+      "accountable_party": {
+        "party_id": "party-de-008",
+        "legal_name": "Terminal Gastronomie Rhein-Main GmbH",
+        "role": "operator",
+        "contact_ref": "mailto:commitments@example.invalid",
+        "jurisdiction": "DE"
+      },
+      "fulfilment_modes": [
+        "collection",
+        "on_site"
+      ],
+      "items": [
+        {
+          "item_id": "bowl.grain.chicken",
+          "label": "grain bowl with chicken",
+          "variants": [
+            {
+              "variant_id": "standard",
+              "unit": "portion",
+              "lead_time_s": 240,
+              "allergen_profile": {
+                "scheme": "eu-fic-1169-2011",
+                "assessed_at": "2026-09-01T07:00:00Z",
+                "assessment_ref": "assessment-2026-09-grain-bowl",
+                "declared": {
+                  "gluten": "present",
+                  "crustaceans": "absent",
+                  "eggs": "absent",
+                  "fish": "absent",
+                  "peanuts": "absent",
+                  "soybeans": "present",
+                  "milk": "may_contain",
+                  "tree_nuts": "absent",
+                  "celery": "unknown",
+                  "mustard": "absent",
+                  "sesame": "present",
+                  "sulphites": "absent",
+                  "lupin": "absent",
+                  "molluscs": "absent"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "capacity_offer",
+      "okp_capacity_version": "0.1-draft",
+      "offer_id": "1c77e310-0000-4000-8000-000000000101",
+      "site_id": "site-de-fra-t1-008",
+      "item_id": "bowl.grain.chicken",
+      "variant_id": "standard",
+      "unit": "portion",
+      "fulfilment_mode": "collection",
+      "window": {
+        "from": "2026-09-19T11:40:00Z",
+        "to": "2026-09-19T12:10:00Z"
+      },
+      "available_units": 24,
+      "basis": "modelled",
+      "confidence": 0.62,
+      "issued_at": "2026-09-19T10:05:00Z",
+      "expires_at": "2026-09-19T10:20:00Z",
+      "price": {
+        "amount": 13.9,
+        "currency": "EUR"
+      },
+      "constraints": {
+        "min_units": 1,
+        "max_units": 12,
+        "order_by": "2026-09-19T11:10:00Z"
+      },
+      "ext": {
+        "example.invalid": {
+          "model": "landing-time demand forecast, 30 minute buckets"
+        }
+      }
+    },
+    {
+      "object": "commitment",
+      "okp_capacity_version": "0.1-draft",
+      "commitment_id": "1c77e310-0000-4000-8000-000000000201",
+      "site_id": "site-de-fra-t1-008",
+      "offer_ref": "1c77e310-0000-4000-8000-000000000101",
+      "state": "held",
+      "item_id": "bowl.grain.chicken",
+      "variant_id": "standard",
+      "units": 3,
+      "unit": "portion",
+      "fulfilment_mode": "collection",
+      "window": {
+        "from": "2026-09-19T11:45:00Z",
+        "to": "2026-09-19T12:00:00Z"
+      },
+      "held_at": "2026-09-19T10:06:30Z",
+      "expires_at": "2026-09-19T10:16:30Z",
+      "requester_ref": "agent-corr-b91a4e",
+      "accountable_party": {
+        "party_id": "party-de-008",
+        "legal_name": "Terminal Gastronomie Rhein-Main GmbH",
+        "role": "operator",
+        "contact_ref": "mailto:commitments@example.invalid",
+        "jurisdiction": "DE"
+      },
+      "on_failure": {
+        "remedy": "substitute_offered",
+        "notice_min_s": 600,
+        "notice_ref": "https://example.invalid/fra-008/notice"
+      }
+    }
+  ]
+}

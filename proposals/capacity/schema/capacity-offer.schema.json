@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://okp.epulo.ai/proposals/capacity/schema/capacity-offer.schema.json",
+  "title": "OKP Capacity Offer (proposal)",
+  "description": "What a site can produce inside one time window, given its current state. A perishable answer, not a listing. PROPOSAL 0.1-draft. This is not part of OKP v0.2, it is not ratified, and it is not stable to build against.",
+  "type": "object",
+  "required": [
+    "object",
+    "okp_capacity_version",
+    "offer_id",
+    "site_id",
+    "item_id",
+    "variant_id",
+    "unit",
+    "fulfilment_mode",
+    "window",
+    "available_units",
+    "basis",
+    "confidence",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "object": {
+      "const": "capacity_offer"
+    },
+    "okp_capacity_version": {
+      "const": "0.1-draft"
+    },
+    "offer_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "site_id": {
+      "type": "string"
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+      "description": "An item_id the site's capability document declares."
+    },
+    "variant_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,31}$"
+    },
+    "unit": {
+      "enum": [
+        "portion",
+        "cover",
+        "tray",
+        "pack",
+        "litre",
+        "kilogram"
+      ]
+    },
+    "fulfilment_mode": {
+      "enum": [
+        "on_site",
+        "collection",
+        "delivery",
+        "room_service"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "description": "The fulfilment window the units are producible in. Not a delivery estimate: a window the site is prepared to be held to.",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "available_units": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Units producible in the window on top of load already committed. Zero is a legitimate and useful answer. Capacity is expressed in units; staffing, roster and headcount never appear here.",
+      "maximum": 1000000
+    },
+    "basis": {
+      "enum": [
+        "measured",
+        "modelled",
+        "declared"
+      ],
+      "description": "How the number was arrived at: read from the running system, produced by a model of it, or asserted by the operator."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "The field exists to carry uncertainty, not to hide it."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "After this instant the offer is void and MUST NOT be held against. An offer without an expiry is a promise with no owner."
+    },
+    "price": {
+      "type": "object",
+      "description": "Informational only. This proposal defines no payment instrument, authorisation, settlement, refund or tax semantics; a payment protocol owns all of that.",
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Price per unit, exclusive of anything this proposal does not define."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217."
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "min_units": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_units": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "order_by": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Latest instant a commitment against this offer can be confirmed. Usually earlier than the window, because production has to start."
+        }
+      },
+      "additionalProperties": false
+    },
+    "ext": {
+      "type": "object",
+      "description": "Vendor extensions. Keys MUST be reverse-domain names controlled by the producer.",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "status": "proposal",
+  "version": "0.1-draft"
+}
